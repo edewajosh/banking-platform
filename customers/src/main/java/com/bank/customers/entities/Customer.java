@@ -13,14 +13,16 @@ public class Customer {
     private String lastName;
     private String otherName;
 
-    public Customer(String firstName, String lastName, String otherName) {
+    public Customer(Long id, String firstName, String lastName, String otherName) {
+        this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.otherName = otherName;
     }
-    public Customer(String firstName, String lastName) {
+    public Customer(String firstName, String lastName, String otherName) {
         this.firstName = firstName;
         this.lastName = lastName;
+        this.otherName = otherName;
     }
     public Customer() {}
 

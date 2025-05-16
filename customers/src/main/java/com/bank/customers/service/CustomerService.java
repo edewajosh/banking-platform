@@ -52,12 +52,14 @@ public class CustomerService {
             return null;
         }
     }
-    public void deleteCustomer(Long id) {
+    public boolean deleteCustomer(Long id) {
         logger.info("Delete customer by id: {}", id);
         try {
             customerRepo.deleteById(id);
+            return true;
         }catch (Exception e) {
             logger.error("Error occurred while deleting {}", e.getMessage());
+            return false;
         }
     }
 }
