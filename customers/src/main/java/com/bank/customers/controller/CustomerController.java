@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "api/v1/customer")
+@RequestMapping(path = "api/v1/customer")
 public class CustomerController {
     final Logger logger = LoggerFactory.getLogger(this.getClass());
     final CustomerService customerService;
@@ -32,7 +32,7 @@ public class CustomerController {
         return new ResponseEntity<>(customer, HttpStatus.BAD_REQUEST);
     }
 
-    @PostMapping("/{id}")
+    @PostMapping(value = "/{id}")
     public ResponseEntity<Customer> updateCustomer(@RequestBody Customer customer, @PathVariable Long id) {
         logger.info("Updating customer: {} {}", customer.getFirstName(), customer.getLastName());
         Customer customer1 = customerService.findCustomerById(id);
@@ -45,14 +45,12 @@ public class CustomerController {
         }
         return new ResponseEntity<>(customer, HttpStatus.BAD_REQUEST);
     }
-    @GetMapping("/{id}")
+    @GetMapping(value = "/{id}")
     public ResponseEntity<Customer> findCustomerById(@PathVariable Long id) {
         logger.info("Find customer by id: {}", id);
         Customer cust = customerService.findCustomerById(id);
-        if (cust != null) {
-           return new ResponseEntity<>(cust, HttpStatus.OK);
-        }
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        logger.info("Found customer: {}", cust);
+        return new ResponseEntity<>(cust, HttpStatus.OK);
     }
 
     @GetMapping
@@ -65,7 +63,7 @@ public class CustomerController {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-    @DeleteMapping(path = "/{id}")
+    @DeleteMapping(value = "/{id}")
     public ResponseEntity<?> deleteCustomer(@PathVariable Long id) {
         logger.info("Deleting customer: {}", id);
         boolean deleted = customerService.deleteCustomer(id);
