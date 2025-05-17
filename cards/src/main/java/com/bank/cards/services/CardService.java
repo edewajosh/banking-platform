@@ -31,16 +31,42 @@ public class CardService {
     public Response createCard(Card card) {
         try {
             logger.info("Creating new card");
-            String resp = restClient().get().uri("/account-id/"+card.getAccountID()).retrieve().body(String.class);
+            Response response = mapCardToResponse(card);
+            logger.info("Successfully created card: {}", response.accounts);
+            return response;
+        }catch (Exception e) {
+            logger.error("Error while creating a card: {}", e.getMessage());
+        }
+        return null;
+    }
+
+    public Response getCardByAccountID(Long id) {
+       try {
+           logger.info("Getting card by account ID: {}", id);
+           Card card = cardRepo.findById(id).orElse(null);
+           if(card != null){
+               Response response = mapCardToResponse(card);
+               logger.info("Successfully get card by account ID: {}", response.accounts);
+               return response;
+           }
+       }catch (Exception e) {
+           logger.error("Error while getting card by account ID: {}", e.getMessage());
+       }
+       return null;
+    }
+
+    public Response mapCardToResponse(Card card) {
+        try {
+            String resp = restClient().get().uri("/account-id/" + card.getAccountID()).retrieve().body(String.class);
             CustomerInfoDto customerInfoDto = mapper.readValue(resp, CustomerInfoDto.class);
-            if(customerInfoDto.accounts().getFirst().accountNumber() != null && !customerInfoDto.accounts().getFirst().accountNumber().isEmpty()){
+            if (customerInfoDto.accounts().getFirst().accountNumber() != null && !customerInfoDto.accounts().getFirst().accountNumber().isEmpty()) {
                 cardRepo.save(card);
                 Response response = new Response();
                 response.customer = customerInfoDto.customer();
                 logger.info("Customer response: {}", response.customer);
                 ArrayList<Account> accounts = new ArrayList<>();
                 logger.info("Accounts response size: {}", customerInfoDto.accounts().size());
-                for(AccountDto accountDto: customerInfoDto.accounts()){
+                for (AccountDto accountDto : customerInfoDto.accounts()) {
                     Account account = new Account();
                     account.accountType = accountDto.accountType();
                     account.accountNumber = accountDto.accountNumber();
@@ -52,16 +78,14 @@ public class CardService {
                     accounts.add(account);
                 }
                 response.accounts = accounts;
-                logger.info("Successfully created card: {}", response.accounts);
                 return response;
             }
-
         }catch (Exception e) {
-            logger.error("Error while creating a card: {}", e.getMessage());
+            logger.error("Error while mapping a card: {}", e.getMessage());
+            return null;
         }
         return null;
     }
-
     RestClient restClient(){
         return RestClient.builder().baseUrl(configs.baseUrl()).build();
     }
