@@ -6,3 +6,11 @@ spring:
     url: jdbc:postgresql://localhost:5432/dtb
     username: postgres
     password: 10@Password
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+bank:
+  platform:
+    customer:
+      base-url: http://localhost:8080/api/v1/customer

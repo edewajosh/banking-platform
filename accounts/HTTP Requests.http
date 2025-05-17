@@ -1,0 +1,18 @@
+POST http://localhost:8081/api/v1/account
+Content-Type: application/json
+
+{
+  "accountNumber": "123485674",
+  "iban": "DTBKENLI52123445",
+  "bicSwift": "SWIFTKEN121234",
+  "customerId": 1
+}
+###
+GET http://localhost:8081/api/v1/account/123456745
+Accept: application/json
+
+###
+GET http://localhost:8081/api/v1/account/account-id/1
+Accept: application/json
+
+###

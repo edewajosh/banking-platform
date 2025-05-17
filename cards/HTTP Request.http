@@ -1,0 +1,13 @@
+POST http://localhost:8082/api/v1/cards
+Content-Type: application/json
+
+{
+  "cardNumber": "2244-2345-0780",
+  "cardType": "PRE-PAID",
+  "cvv": "067",
+  "pan": "23455",
+  "aliasName": "DOE DOE",
+  "accountID": 2
+}
+
+###
