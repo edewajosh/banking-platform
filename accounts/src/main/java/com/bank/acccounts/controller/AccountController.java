@@ -1,4 +1,4 @@
-package com.bank.acccounts.controllers;
+package com.bank.acccounts.controller;
 
 import com.bank.acccounts.dto.CustomerInfoDto;
 import com.bank.acccounts.entities.Account;
@@ -48,6 +48,6 @@ public class AccountController {
             logger.info("Customer with ID found");
             return new ResponseEntity<>(customerInfoDto, HttpStatus.OK);
         }
-        return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 }

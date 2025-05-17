@@ -55,6 +55,20 @@ public class CardService {
        return null;
     }
 
+    public Card updateCard(Card card) {
+        try {
+            logger.info("Updating card: {}", card.getAliasName());
+            Card card1 = cardRepo.findById(card.getId()).orElse(null);
+            if(card1 != null){
+                card1.setAliasName(card.getAliasName());
+                return cardRepo.save(card1);
+            }
+            return null;
+        }catch (Exception e){
+            logger.error("Error while updating card: {}", e.getMessage());
+        }
+        return null;
+    }
     public Response mapCardToResponse(Card card) {
         try {
             String resp = restClient().get().uri("/account-id/" + card.getAccountID()).retrieve().body(String.class);

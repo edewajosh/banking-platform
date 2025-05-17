@@ -14,3 +14,16 @@ Content-Type: application/json
 GET http://localhost:8082/api/v1/cards/302
 Content-Type: application/json
 ###
+
+PUT http://localhost:8082/api/v1/cards
+Content-Type: application/json
+
+{
+  "id": 202,
+  "cardNumber": "2244-2345-0780-1234",
+  "cardType": "PRE-PAID",
+  "cvv": "067",
+  "pan": "23455",
+  "aliasName": "JOHN SMITH",
+  "accountID": 1
+}

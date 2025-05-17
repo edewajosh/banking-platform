@@ -1,11 +1,12 @@
-## Customer Microservice
-**Customer fields**
-1. id - customer id **mandatory** and **Unique**
-2. firstName - First Name, **Mandatory**
-3. lastName - Last Name, **Mandatory**
-4. otherName - Other Name, **Optional**
+## Banking Platform
+Is application service built on microservice architecture. It is made up of 3 services *Customer*, *Account* and *Cards*.
 
-## Cards
+It is built in a such away:-
+
+**Customer**: When you fetch a customer using ID it will return customer, account and cards details associated with that customer. We are achieving this making API call to the other microservices.
+
+## Cards Microservice
+
 Base url
 
 ```http://localhost:8082/api/v1/cards```
@@ -65,5 +66,35 @@ curl --location 'http://localhost:8082/api/v1/cards/202'
       ]
     }
   ]
+}
+```
+### Cards update
+**Request**
+```
+    PUT http://localhost:8082/api/v1/cards
+Content-Type: application/json
+
+{
+  "id": 202,
+  "cardNumber": "2244-2345-0780-1234",
+  "cardType": "PRE-PAID",
+  "cvv": "067",
+  "pan": "23455",
+  "aliasName": "JOHN SMITH",
+  "accountID": 1
+}
+```
+
+**Response**
+```json
+    {
+  "id": 202,
+  "cardNumber": "2244-2345-0780",
+  "cardType": "PRE-PAID",
+  "cvv": "067",
+  "pan": "23455",
+  "aliasName": "JOHN SMITH",
+  "expiryDate": null,
+  "accountID": 2
 }
 ```

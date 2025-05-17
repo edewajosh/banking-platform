@@ -23,9 +23,9 @@ class CustomerControllerTests {
     @Autowired
     MockMvc mockMvc;
     @MockitoBean
-   CustomerService customerService;
+    CustomerService customerService;
     @Autowired
-   ObjectMapper objectMapper;
+    ObjectMapper objectMapper;
 
     @Test
     void createCustomer_ShouldReturnCustomer() throws Exception {

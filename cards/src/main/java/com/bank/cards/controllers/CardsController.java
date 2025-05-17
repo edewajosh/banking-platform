@@ -38,6 +38,17 @@ public class CardsController {
             logger.info("Get card by id successful");
             return new ResponseEntity<>(response, HttpStatus.OK);
         }
-        return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(null, HttpStatus.BAD_GATEWAY);
+    }
+
+    @PutMapping
+    public ResponseEntity<Card> updateCard(@RequestBody Card card) {
+        logger.info("Update card");
+        Card updatedCard = cardService.updateCard(card);
+        if(updatedCard != null) {
+            logger.info("Update card successful");
+            return new ResponseEntity<>(updatedCard, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
     }
 }
