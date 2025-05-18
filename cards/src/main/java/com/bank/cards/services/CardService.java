@@ -30,10 +30,14 @@ public class CardService {
 
     public Response createCard(Card card) {
         try {
-            logger.info("Creating new card");
-            Response response = mapCardToResponse(card);
-            logger.info("Successfully created card: {}", response.accounts);
-            return response;
+            // Check if the Account has the more one card and card type does not exist
+            if(numberOfCards(card) < 2 && !cardTypeExists(card)) {
+                logger.info("Creating new card");
+                Response response = mapCardToResponse(card);
+                logger.info("Successfully created card: {}", response.accounts);
+                return response;
+            }
+            return null;
         }catch (Exception e) {
             logger.error("Error while creating a card: {}", e.getMessage());
         }
@@ -99,6 +103,21 @@ public class CardService {
             return null;
         }
         return null;
+    }
+
+    int numberOfCards(Card card) {
+        List<Card> cards = cardRepo.findByAccountID(card.getAccountID());
+        return cards.size();
+    }
+
+    boolean cardTypeExists(Card card) {
+        List<Card> cards = cardRepo.findByAccountID(card.getAccountID());
+        for (Card ca : cards) {
+            if(ca.getCardType() == card.getCardType()) {
+                return true;
+            }
+        }
+        return false;
     }
     RestClient restClient(){
         return RestClient.builder().baseUrl(configs.baseUrl()).build();
