@@ -4,6 +4,9 @@ import com.bank.customers.entities.Customer;
 import com.bank.customers.repo.CustomerRepo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -40,13 +43,14 @@ public class CustomerService {
             return null;
         }
     }
-    public List<Customer> findAllCustomers() {
+    public List<Customer> findAllCustomers(int page, int size) {
         // TODO Add logic to fetch accounts associated for each customer
         logger.info("Find all customers");
         try {
-            List<Customer> customers = (List<Customer>) customerRepo.findAll();
-            logger.info("Customers size: {}", customers.size());
-            return customers;
+            Pageable pageable = PageRequest.of(page,size);
+            Page<Customer> customers = customerRepo.findAll(pageable);
+            logger.info("Customers size: {}", customers.stream().toList().size());
+            return customers.stream().toList();
         } catch (Exception e) {
             logger.error("Error occurred while fetching customer {}", e.getMessage());
             return null;

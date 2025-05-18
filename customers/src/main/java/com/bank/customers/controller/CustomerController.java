@@ -54,9 +54,10 @@ public class CustomerController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Customer>> findAllCustomers() {
+    public ResponseEntity<List<Customer>> findAllCustomers(@RequestParam(defaultValue = "0") int page,
+                                                           @RequestParam(defaultValue = "10") int size) {
         logger.info("Find all customers");
-        List<Customer> customers = customerService.findAllCustomers();
+        List<Customer> customers = customerService.findAllCustomers(page,size);
         if (customers != null) {
             return new ResponseEntity<>(customers, HttpStatus.OK);
         }
