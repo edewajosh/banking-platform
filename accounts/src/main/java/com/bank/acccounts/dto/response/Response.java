@@ -1,8 +1,6 @@
-package com.bank.cards.dto;
+package com.bank.acccounts.dto.response;
 
-import com.bank.cards.utils.ResponseHeader;
-
-import java.util.ArrayList;
+import com.bank.acccounts.utils.ResponseHeader;
 
 public class Response {
     public ResponseHeader responseHeader;

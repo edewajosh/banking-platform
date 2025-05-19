@@ -1,12 +1,11 @@
 package com.bank.cards.services;
 
 import com.bank.cards.configs.AccountsConfigs;
-import com.bank.cards.dto.Account;
-import com.bank.cards.dto.AccountDto;
-import com.bank.cards.dto.CustomerInfoDto;
-import com.bank.cards.dto.Response;
+import com.bank.cards.dto.*;
 import com.bank.cards.entities.Card;
 import com.bank.cards.repo.CardRepo;
+import com.bank.cards.utils.ResponseHeader;
+import com.bank.cards.utils.SuccessFailureEnums;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +14,7 @@ import org.springframework.web.client.RestClient;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class CardService {
@@ -31,15 +31,43 @@ public class CardService {
     public Response createCard(Card card) {
         try {
             // Check if the Account has the more one card and card type does not exist
-            if(numberOfCards(card) < 2 && !cardTypeExists(card)) {
-                logger.info("Creating new card");
-                Response response = mapCardToResponse(card);
-                logger.info("Successfully created card: {}", response.accounts);
-                return response;
+            int numberOfCards = numberOfCards(card);
+            logger.info("Account with ID: {} has {}", card.getAccountID(), numberOfCards);
+            Response response = new Response();
+            if(numberOfCards <= 2) {
+                boolean exists = cardTypeExists(card);
+                logger.info("Card type exists: {} -> {}", card.getCardType(), exists);
+                if(!exists) {
+                    logger.info("Creating new card");
+                    response = mapCardToResponse(card);
+                    if(response.primaryData != null) {
+                        logger.info("Successfully created card: {}", response.primaryData.accounts);
+                        ResponseHeader header = new ResponseHeader(SuccessFailureEnums.SUCCESS_CODE,
+                                SuccessFailureEnums.SUCCESS_STATUS_MESSAGE, "201", "Card created successfully");
+                        logger.info("Success response header: {}", header);
+                        response.responseHeader = header;
+                    }else {
+                        ResponseHeader header = new ResponseHeader(SuccessFailureEnums.SUCCESS_CODE,
+                                SuccessFailureEnums.SUCCESS_STATUS_MESSAGE, "400", "Error creating card");
+                        logger.info("Failed response header: {}", header);
+                        response.responseHeader = header;
+                    }
+                }else{
+                    ResponseHeader header = new ResponseHeader(SuccessFailureEnums.FAILURE_CODE,
+                            SuccessFailureEnums.FAILURE_STATUS_MESSAGE, "400", "Card type exists for the account");
+                    response.primaryData = null;
+                    response.responseHeader = header;
+                }
+            }else{
+                ResponseHeader header = new ResponseHeader(SuccessFailureEnums.FAILURE_CODE,
+                        SuccessFailureEnums.FAILURE_STATUS_MESSAGE, "400", "Account has 2 already created cards");
+                response.primaryData = null;
+                logger.info("Account has 2 cards already");
+                response.responseHeader = header;
             }
-            return null;
+            return response;
         }catch (Exception e) {
-            logger.error("Error while creating a card: {}", e.getMessage());
+            logger.error("Error while creating a card: {}", e.fillInStackTrace());
         }
         return null;
     }
@@ -50,7 +78,7 @@ public class CardService {
            Card card = cardRepo.findById(id).orElse(null);
            if(card != null){
                Response response = mapCardToResponse(card);
-               logger.info("Successfully get card by account ID: {}", response.accounts);
+               logger.info("Successfully get card by account ID: {}", response.primaryData.accounts);
                return response;
            }
        }catch (Exception e) {
@@ -77,11 +105,13 @@ public class CardService {
         try {
             String resp = restClient().get().uri("/account-id/" + card.getAccountID()).retrieve().body(String.class);
             CustomerInfoDto customerInfoDto = mapper.readValue(resp, CustomerInfoDto.class);
-            if (customerInfoDto.accounts().getFirst().accountNumber() != null && !customerInfoDto.accounts().getFirst().accountNumber().isEmpty()) {
+            logger.info("Customer info: {}", customerInfoDto);
+            Response response = new Response();
+            if(customerInfoDto.accounts().getFirst().accountNumber() != null && !customerInfoDto.accounts().getFirst().accountNumber().isEmpty()) {
                 cardRepo.save(card);
-                Response response = new Response();
-                response.customer = customerInfoDto.customer();
-                logger.info("Customer response: {}", response.customer);
+                PrimaryData data = new PrimaryData();
+                data.customer =customerInfoDto.customer();
+                logger.info("Customer response: {}", data.customer);
                 ArrayList<Account> accounts = new ArrayList<>();
                 logger.info("Accounts response size: {}", customerInfoDto.accounts().size());
                 for (AccountDto accountDto : customerInfoDto.accounts()) {
@@ -95,25 +125,31 @@ public class CardService {
                     logger.info("Account cards: {} ", account.cards.size());
                     accounts.add(account);
                 }
-                response.accounts = accounts;
-                return response;
+                data.accounts = accounts;
+                response.primaryData = data;
+            }else {
+                response.responseHeader = new ResponseHeader(SuccessFailureEnums.FAILURE_CODE, SuccessFailureEnums.FAILURE_STATUS_MESSAGE,
+                        "400", "Account does not exist");
+                response.primaryData = null;
             }
+            return response;
         }catch (Exception e) {
             logger.error("Error while mapping a card: {}", e.getMessage());
             return null;
         }
-        return null;
     }
 
     int numberOfCards(Card card) {
         List<Card> cards = cardRepo.findByAccountID(card.getAccountID());
+        logger.info("Number of cards: {}", cards.size());
         return cards.size();
     }
 
     boolean cardTypeExists(Card card) {
         List<Card> cards = cardRepo.findByAccountID(card.getAccountID());
         for (Card ca : cards) {
-            if(ca.getCardType() == card.getCardType()) {
+            if(Objects.equals(ca.getCardType(), card.getCardType())) {
+                logger.info("Account with card type: {} found", ca.getCardType());
                 return true;
             }
         }

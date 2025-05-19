@@ -3,6 +3,8 @@ package com.bank.acccounts.services;
 import com.bank.acccounts.configs.CustomerConfigs;
 import com.bank.acccounts.dto.CustomerDto;
 import com.bank.acccounts.dto.CustomerInfoDto;
+import com.bank.acccounts.dto.response.Customer;
+import com.bank.acccounts.dto.response.Response;
 import com.bank.acccounts.entities.Account;
 import com.bank.acccounts.repo.AccountRepo;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -31,11 +33,14 @@ public class AccountService {
             logger.info("Creating account: {}", account.getAccountNumber());
             String response = restClient().get().uri("/" + account.getCustomerId()).retrieve().body(String.class);
             logger.info("Raw response customer service : {}", response);
-            CustomerDto customerDto = objectMapper.readValue(response, CustomerDto.class);
-            if (customerDto.id() != null) {
-                account.setCustomerId(customerDto.id());
+            Response res = objectMapper.readValue(response, Response.class);
+            if (res.primaryData != null) {
+                account.setCustomerId(res.primaryData.customer.id());
                 Account account1 = accountRepo.save(account);
                 logger.info("Saved account : {}", account1);
+                Customer customer = res.primaryData.customer;
+
+                CustomerDto customerDto = new CustomerDto(customer.id(), customer.firstName(), customer.lastName(), customer.otherName());
                 CustomerInfoDto customerInfoDto = new CustomerInfoDto(customerDto, new ArrayList<>(){{add(account);}});
                 logger.info("Mapped account to customer info : {}", customerInfoDto);
                 return customerInfoDto;
@@ -55,9 +60,11 @@ public class AccountService {
           if (account != null) {
               String response = restClient().get().uri("/"+ account.getCustomerId()).retrieve().body(String.class);
               logger.info("A/C-Raw response customer service : {}", response);
-              CustomerDto accountDto = objectMapper.readValue(response, CustomerDto.class);
-              logger.info("A/C-Mapped account to customer info : {}", accountDto);
-              CustomerInfoDto customerInfoDto = new CustomerInfoDto(accountDto, new ArrayList<>(){{add(account);}});
+              Response res = objectMapper.readValue(response, Response.class);
+              logger.info("A/C-Mapped account to customer info : {}", res.primaryData.customer);
+              Customer customer = res.primaryData.customer;
+              CustomerDto customerDto = new CustomerDto(customer.id(), customer.firstName(), customer.lastName(), customer.otherName());
+              CustomerInfoDto customerInfoDto = new CustomerInfoDto(customerDto, new ArrayList<>(){{add(account);}});
               logger.info("A/C-Mapped account info to customer info : {}", customerInfoDto);
               return customerInfoDto;
           }else {
@@ -77,9 +84,11 @@ public class AccountService {
             if (account != null) {
                 String response = restClient().get().uri("/"+ account.getCustomerId()).retrieve().body(String.class);
                 logger.info("Raw response customer service by ID : {}", response);
-                CustomerDto accountDto = objectMapper.readValue(response, CustomerDto.class);
-                logger.info("Mapped response account to customer info : {}", accountDto);
-                CustomerInfoDto customerInfoDto = new CustomerInfoDto(accountDto, new ArrayList<>(){{add(account);}});
+                Response res = objectMapper.readValue(response, Response.class);
+                logger.info("Mapped response account to customer info : {}", res.primaryData.customer);
+                Customer customer = res.primaryData.customer;
+                CustomerDto customerDto = new CustomerDto(customer.id(), customer.firstName(), customer.lastName(), customer.otherName());
+                CustomerInfoDto customerInfoDto = new CustomerInfoDto(customerDto, new ArrayList<>(){{add(account);}});
                 logger.info("Mapped account info to customer info : {}", customerInfoDto);
                 return customerInfoDto;
             }else {

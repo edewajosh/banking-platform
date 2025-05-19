@@ -1,7 +1,11 @@
 package com.bank.customers.controller;
 
+import com.bank.customers.dto.PrimaryData;
+import com.bank.customers.dto.Response;
 import com.bank.customers.entities.Customer;
 import com.bank.customers.service.CustomerService;
+import com.bank.customers.utils.ResponseHeader;
+import com.bank.customers.utils.SuccessFailureEnums;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -23,34 +27,46 @@ public class CustomerController {
 
     // CRUD
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Customer> createCustomer(@RequestBody Customer customer) {
+    public ResponseEntity<Response> createCustomer(@RequestBody Customer customer) {
         logger.info("Creating customer: {} {}", customer.getFirstName(), customer.getLastName());
-        Customer cust = customerService.createCustomer(customer);
-        if (cust != null) {
-            return new ResponseEntity<>(cust, HttpStatus.CREATED);
+        Response response = customerService.createCustomer(customer);
+        if (response.primaryData != null) {
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
         }
-        return new ResponseEntity<>(customer, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @PostMapping(value = "/{id}")
-    public ResponseEntity<Customer> updateCustomer(@RequestBody Customer customer, @PathVariable Long id) {
+    public ResponseEntity<Response> updateCustomer(@RequestBody Customer customer, @PathVariable Long id) {
         logger.info("Updating customer: {} {}", customer.getFirstName(), customer.getLastName());
         Customer customer1 = customerService.findCustomerById(id);
+        Response response = new Response();
         if (customer1 != null) {
             customer1.setFirstName(customer.getFirstName());
             customer1.setLastName(customer.getLastName());
             customerService.createCustomer(customer1);
             logger.info("Updated customer: {} {}", customer1.getFirstName(), customer1.getLastName());
-            return new ResponseEntity<>(customer1, HttpStatus.OK);
+            PrimaryData data = new PrimaryData();
+            data.customer = customer;
+            response.primaryData = data;
+            response.responseHeader = new ResponseHeader(SuccessFailureEnums.SUCCESS_CODE, SuccessFailureEnums.SUCCESS_STATUS_MESSAGE,
+                    SuccessFailureEnums.SUCCESS_MESSAGE_CODE, SuccessFailureEnums.SUCCESS_MESSAGE_DESCRIPTION);
+            return new ResponseEntity<>(response, HttpStatus.OK);
         }
-        return new ResponseEntity<>(customer, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
     @GetMapping(value = "/{id}")
-    public ResponseEntity<Customer> findCustomerById(@PathVariable Long id) {
+    public ResponseEntity<Response> findCustomerById(@PathVariable Long id) {
         logger.info("Find customer by id: {}", id);
         Customer cust = customerService.findCustomerById(id);
+        Response response = new Response();
+        PrimaryData data = new PrimaryData();
+        data.customer = cust;
+        response.primaryData = data;
+        response.responseHeader = new ResponseHeader(SuccessFailureEnums.SUCCESS_CODE, SuccessFailureEnums.SUCCESS_STATUS_MESSAGE,
+                SuccessFailureEnums.SUCCESS_MESSAGE_CODE, SuccessFailureEnums.SUCCESS_MESSAGE_DESCRIPTION);
         logger.info("Found customer: {}", cust);
-        return new ResponseEntity<>(cust, HttpStatus.OK);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping

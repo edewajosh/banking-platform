@@ -2,18 +2,18 @@ POST http://localhost:8080/api/v1/customer HTTP/1.1
 Content-Type: application/json
 
 {
-  "firstName": "Michael",
-  "lastName": "Thomas",
-  "otherName": ""
+  "firstName": "Joshua",
+  "lastName": "Doe",
+  "otherName": "Edewa"
 }
 
 ###
-GET http://localhost:8080/api/v1/customer/3
+GET http://localhost:8080/api/v1/customer/55
 Accept: application/json
 
 ###
 
-GET http://localhost:8080/api/v1/customer?page=1&size=3
+GET http://localhost:8080/api/v1/customer?page=1&size=5
 Accept: application/json
 ###
 

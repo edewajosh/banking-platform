@@ -1,7 +1,11 @@
 package com.bank.customers.service;
 
+import com.bank.customers.dto.PrimaryData;
+import com.bank.customers.dto.Response;
 import com.bank.customers.entities.Customer;
 import com.bank.customers.repo.CustomerRepo;
+import com.bank.customers.utils.ResponseHeader;
+import com.bank.customers.utils.SuccessFailureEnums;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -21,14 +25,23 @@ public class CustomerService {
         this.customerRepo = customerRepo;
     }
 
-    public Customer createCustomer(Customer customer) {
+    public Response createCustomer(Customer customer) {
+        Response response = new Response();
         try {
             logger.info("Creating new customer: {}  {} ", customer.getFirstName(), customer.getLastName());
-            return customerRepo.save(customer);
+            Customer cust = customerRepo.save(customer) ;
+            PrimaryData data = new PrimaryData();
+            data.customer = cust;
+            response.primaryData = data;
+            response.responseHeader = new ResponseHeader(SuccessFailureEnums.SUCCESS_CODE, SuccessFailureEnums.SUCCESS_STATUS_MESSAGE,
+                    SuccessFailureEnums.SUCCESS_MESSAGE_CODE, SuccessFailureEnums.SUCCESS_MESSAGE_DESCRIPTION);
         }catch (Exception e) {
             logger.error("Error occurred while creating {}", e.getMessage());
-            return null;
+            response.responseHeader = new ResponseHeader(SuccessFailureEnums.FAILURE_CODE, SuccessFailureEnums.FAILURE_STATUS_MESSAGE,
+                    "400", "Error occurred while creating");
+            return response;
         }
+        return response;
     }
 
     public Customer findCustomerById(Long id) {
