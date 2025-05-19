@@ -260,7 +260,7 @@ Base url
 This returns all information about the card which includes the account number, and customer details
 
 ```
-curl --location 'http://localhost:8082/api/v1/cards/202'
+curl --location 'http://localhost:8082/api/v1/cards/202?unmask=true'
 ```
 #### Response
 ```json

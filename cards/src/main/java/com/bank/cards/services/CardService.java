@@ -125,7 +125,7 @@ public class CardService {
                     account.bicSwift = accountDto.bicSwift();
                     account.id = accountDto.id();
                     account.cards = cardRepo.findByAccountID(accountDto.id()).stream().peek(card1 -> {
-                        if(Objects.equals(unmask, "true")) {
+                        if(Objects.equals(unmask, "false")) {
                             card1.setCvv("XXX");
                             card1.setPan("DTBXXX");
                         }
