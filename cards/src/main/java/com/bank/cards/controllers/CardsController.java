@@ -31,9 +31,9 @@ public class CardsController {
     }
 
     @GetMapping(value = "/{id}")
-    public ResponseEntity<Response> getCardById(@PathVariable  Long id) {
+    public ResponseEntity<Response> getCardById(@PathVariable  Long id, @RequestParam(defaultValue = "false") String unmask) {
         logger.info("Get card by id");
-        Response response = cardService.getCardByAccountID(id);
+        Response response = cardService.getCardByAccountID(id, unmask);
         if(response != null) {
             logger.info("Get card by id successful");
             return new ResponseEntity<>(response, HttpStatus.OK);

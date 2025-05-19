@@ -79,8 +79,8 @@ class CustomerControllerTests {
         mockMvc.perform(get("/api/v1/customer/1")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("id").value(result.getId()))
-                .andExpect(jsonPath("firstName").value(result.getFirstName()));
+                .andExpect(jsonPath("primaryData.customer.id").value(result.getId()))
+                .andExpect(jsonPath("primaryData.customer.firstName").value(result.getFirstName()));
     }
 
     @Test

@@ -15,6 +15,7 @@ import org.springframework.web.client.RestClient;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 public class CardService {
@@ -39,7 +40,7 @@ public class CardService {
                 logger.info("Card type exists: {} -> {}", card.getCardType(), exists);
                 if(!exists) {
                     logger.info("Creating new card");
-                    response = mapCardToResponse(card);
+                    response = mapCardToResponse(card, "true", true);
                     if(response.primaryData != null) {
                         logger.info("Successfully created card: {}", response.primaryData.accounts);
                         ResponseHeader header = new ResponseHeader(SuccessFailureEnums.SUCCESS_CODE,
@@ -72,12 +73,12 @@ public class CardService {
         return null;
     }
 
-    public Response getCardByAccountID(Long id) {
+    public Response getCardByAccountID(Long id, String unmask) {
        try {
            logger.info("Getting card by account ID: {}", id);
            Card card = cardRepo.findById(id).orElse(null);
            if(card != null){
-               Response response = mapCardToResponse(card);
+               Response response = mapCardToResponse(card, unmask, false);
                logger.info("Successfully get card by account ID: {}", response.primaryData.accounts);
                return response;
            }
@@ -101,14 +102,16 @@ public class CardService {
         }
         return null;
     }
-    public Response mapCardToResponse(Card card) {
+    public Response mapCardToResponse(Card card, String unmask, boolean create) {
         try {
             String resp = restClient().get().uri("/account-id/" + card.getAccountID()).retrieve().body(String.class);
             CustomerInfoDto customerInfoDto = mapper.readValue(resp, CustomerInfoDto.class);
             logger.info("Customer info: {}", customerInfoDto);
             Response response = new Response();
             if(customerInfoDto.accounts().getFirst().accountNumber() != null && !customerInfoDto.accounts().getFirst().accountNumber().isEmpty()) {
-                cardRepo.save(card);
+                if(create) {
+                    cardRepo.save(card);
+                }
                 PrimaryData data = new PrimaryData();
                 data.customer =customerInfoDto.customer();
                 logger.info("Customer response: {}", data.customer);
@@ -121,7 +124,12 @@ public class CardService {
                     account.iban = accountDto.iban();
                     account.bicSwift = accountDto.bicSwift();
                     account.id = accountDto.id();
-                    account.cards = cardRepo.findByAccountID(accountDto.id());
+                    account.cards = cardRepo.findByAccountID(accountDto.id()).stream().peek(card1 -> {
+                        if(Objects.equals(unmask, "true")) {
+                            card1.setCvv("XXX");
+                            card1.setPan("DTBXXX");
+                        }
+                    }).toList();
                     logger.info("Account cards: {} ", account.cards.size());
                     accounts.add(account);
                 }

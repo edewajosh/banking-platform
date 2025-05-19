@@ -208,8 +208,18 @@ Base url
                 "id": 652,
                 "cardNumber": "8800-2345-0780-1234",
                 "cardType": "CREDIT",
-                "cvv": "067",
-                "pan": "23455",
+                "cvv": "XXX",
+                "pan": "DTBXXX",
+                "aliasName": "JOHN SMITH",
+                "expiryDate": null,
+                "accountID": 57
+              },
+              {
+                "id": 702,
+                "cardNumber": "8800-2345-0780-1234",
+                "cardType": "DEBIT",
+                "cvv": "XXX",
+                "pan": "DTBXXX",
                 "aliasName": "JOHN SMITH",
                 "expiryDate": null,
                 "accountID": 57
@@ -255,53 +265,76 @@ curl --location 'http://localhost:8082/api/v1/cards/202'
 #### Response
 ```json
     {
-  "customer": {
-    "firstName": "Jane",
-    "lastName": "Doe",
-    "otherName": "Smith"
-  },
-  "accounts": [
-    {
-      "id": 2,
-      "accountNumber": "123485674",
-      "iban": "DTBKENLI52123445",
-      "bicSwift": "SWIFTKEN121234",
-      "accountType": null,
-      "cards": [
-        {
-          "id": 152,
-          "cardNumber": "2244-2345-078&",
-          "cardType": "CREDIT",
-          "cvv": "067",
-          "pan": "23455",
-          "aliasName": "DOE DOE",
-          "expiryDate": null,
-          "accountID": 2
+      "responseHeader": null,
+      "primaryData": {
+        "customer": {
+          "firstName": "John",
+          "lastName": "Smith",
+          "otherName": null
         },
-        {
-          "id": 202,
-          "cardNumber": "2244-2345-0780",
-          "cardType": "PRE-PAID",
-          "cvv": "067",
-          "pan": "23455",
-          "aliasName": "DOE DOE",
-          "expiryDate": null,
-          "accountID": 2
-        },
-        {
-          "id": 252,
-          "cardNumber": "2244-2345-0780",
-          "cardType": "PRE-PAID",
-          "cvv": "067",
-          "pan": "23455",
-          "aliasName": "DOE DOE",
-          "expiryDate": null,
-          "accountID": 2
-        }
-      ]
+        "accounts": [
+          {
+            "id": 1,
+            "accountNumber": "12345674",
+            "iban": "DTBKENLI52123445",
+            "bicSwift": "SWIFTKEN121234",
+            "accountType": null,
+            "cards": [
+              {
+                "id": 1,
+                "cardNumber": "1234-2345-6789",
+                "cardType": "DEBIT",
+                "cvv": "XXX",
+                "pan": "DTBXXX",
+                "aliasName": "JANE DOE DOE",
+                "expiryDate": null,
+                "accountID": 1
+              },
+              {
+                "id": 2,
+                "cardNumber": "2234-2345-6789",
+                "cardType": "DEBIT",
+                "cvv": "XXX",
+                "pan": "DTBXXX",
+                "aliasName": "JANE DOE DOE",
+                "expiryDate": null,
+                "accountID": 1
+              },
+              {
+                "id": 52,
+                "cardNumber": "2234-2345-6789",
+                "cardType": "DEBIT",
+                "cvv": "XXX",
+                "pan": "DTBXXX",
+                "aliasName": "JANE DOE DOE",
+                "expiryDate": null,
+                "accountID": 1
+              },
+              {
+                "id": 102,
+                "cardNumber": "2234-2345-0789",
+                "cardType": "CREDIT",
+                "cvv": "XXX",
+                "pan": "DTBXXX",
+                "aliasName": "JANE DOE DOE",
+                "expiryDate": null,
+                "accountID": 1
+              },
+              {
+                "id": 302,
+                "cardNumber": "2244-2345-0780-1234",
+                "cardType": "PRE-PAID",
+                "cvv": "XXX",
+                "pan": "DTBXXX",
+                "aliasName": "JOHN DOE",
+                "expiryDate": null,
+                "accountID": 1
+              }
+            ]
+          }
+        ]
+      }
     }
-  ]
-}
 ```
 ### Cards update
 **Request**
@@ -333,3 +366,9 @@ Content-Type: application/json
   "accountID": 2
 }
 ```
+
+### NOTE
+#### APPLICATION PORTS
+* 8080 - Customer Application
+* 8081 - Account Application
+* 8082 - Card Application

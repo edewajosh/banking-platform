@@ -3,7 +3,7 @@ Content-Type: application/json
 
 {
   "cardNumber": "8800-2345-0780-1234",
-  "cardType": "CREDIT",
+  "cardType": "PRE-PAID",
   "cvv": "067",
   "pan": "23455",
   "aliasName": "JOHN SMITH",
@@ -11,7 +11,7 @@ Content-Type: application/json
 }
 
 ###
-GET http://localhost:8082/api/v1/cards/302
+GET http://localhost:8082/api/v1/cards/302?unmask=true
 Content-Type: application/json
 ###
 
