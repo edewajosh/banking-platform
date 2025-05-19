@@ -368,8 +368,14 @@ Content-Type: application/json
 ```
 
 ### NOTE
+### DATABASE
+Create database in POSTGRES 
+
+```create database dtb```
+
+Then update the ```application.yml``` of the 3 services with correct **_password_** and **_username_**
+
 #### APPLICATION PORTS
 * 8080 - Customer Application
 * 8081 - Account Application
 * 8082 - Card Application
-![img.png](img.png)
